@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f7f7f5;
+  --foreground: #262623;
+  --card: #ffffff;
+  --card-foreground: #262623;
+  --popover: #ffffff;
+  --popover-foreground: #262623;
+  --primary: #db4b37;
+  --primary-foreground: #ffffff;
+  --secondary: #f3f3ef;
+  --secondary-foreground: #42443d;
+  --muted: #f5f5f1;
+  --muted-foreground: #72746c;
+  --accent: #f0f0eb;
+  --accent-foreground: #262623;
+  --destructive: #b93828;
+  --border: #e5e5df;
+  --input: #ddded6;
+  --ring: #db4b37;
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: Arial, Helvetica, sans-serif;
+}
+
+* { border-color: var(--border); }
+body { margin: 0; background: var(--background); color: var(--foreground); font-family: Arial, Helvetica, sans-serif; }
+button, summary, select { -webkit-tap-highlight-color: transparent; }
+button:not(:disabled), summary, select:not(:disabled) { cursor: pointer; }
+::selection { background: #ffe2d9; }
+:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+.tabular-nums { font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: 10px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; }
+.event-json { max-height: 290px; overflow: auto; overflow-wrap: anywhere; white-space: pre-wrap; }
+.agent-pulse { animation: agent-pulse 1.8s ease-in-out infinite; }
+@keyframes agent-pulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
