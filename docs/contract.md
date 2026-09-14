@@ -62,6 +62,6 @@ assessment, and receives independent post-action verification. Application code
 enforces evidence completeness and constraints. A run cannot claim successful
 purchasing without verification. No scripted fallback may masquerade as AI.
 
-Use `GEMINI_API_KEY`, `GEMINI_MODEL` (default `gemini-3.5-flash`),
+Use `GEMINI_API_KEY`, `GEMINI_MODEL` (default `gemini-3.1-flash-lite`),
 `DATABASE_PATH` (default `data/purchasing.db`), and frontend-only server setting
 `BACKEND_URL` (default `http://127.0.0.1:8000`).

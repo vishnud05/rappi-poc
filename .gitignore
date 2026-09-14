@@ -24,6 +24,7 @@ data/
 # Tool output
 .logs/
 .cache/
+.serena/
 test-results/
 playwright-report/
 *.log

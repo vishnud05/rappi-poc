@@ -1,0 +1,17 @@
+[project]
+name = "buyer-agent"
+version = "0.1.0"
+description = "Evidence-driven purchasing agent with verified mock execution"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.135.0",
+  "google-genai>=1.66.0",
+  "pydantic>=2.12.0",
+  "uvicorn>=0.41.0",
+]
+
+[dependency-groups]
+dev = ["httpx>=0.28.0"]
+
+[tool.uv]
+package = false
