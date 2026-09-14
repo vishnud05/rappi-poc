@@ -12,6 +12,7 @@ from backend.policy import assess
 from backend.store import Store, now
 
 MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+MAX_GENERATION_ATTEMPTS = 2
 EVIDENCE = {"read_inventory", "read_demand", "read_supplier_terms", "read_constraints"}
 SYSTEM = """You are the purchasing agent for one product at one fulfillment node.
 Review the original purchase recommendation, investigate real evidence using tools,
@@ -205,7 +206,9 @@ async def run_agent(store: Store, rid: str):
         config = types.GenerateContentConfig(system_instruction=SYSTEM, temperature=0.1,
                     tools=[types.Tool(function_declarations=declarations)],
                     automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True))
-        async with genai.Client(api_key=key, http_options=types.HttpOptions(timeout=25000, retry_options=types.HttpRetryOptions(attempts=1))).aio as client:
+        http_options = types.HttpOptions(timeout=25000, retry_options=types.HttpRetryOptions(
+            attempts=MAX_GENERATION_ATTEMPTS, initial_delay=1, max_delay=2, http_status_codes=[502, 503, 504]))
+        async with genai.Client(api_key=key, http_options=http_options).aio as client:
             for turn in range(1, 13):
                 store.event(rid, "info", "model_turn", {"turn": turn, "limit": 12})
                 response = await client.models.generate_content(model=store.run(rid)["model"], contents=contents, config=config)

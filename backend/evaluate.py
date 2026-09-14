@@ -7,7 +7,7 @@ from pathlib import Path
 import tempfile
 import time
 
-from backend.agent import EVIDENCE, MODEL, run_agent
+from backend.agent import EVIDENCE, MAX_GENERATION_ATTEMPTS, MODEL, run_agent
 from backend.store import Store, now
 
 # Independent acceptance outcomes. Never included in the model's prompt or tools.
@@ -27,6 +27,7 @@ EXPECTED = {
 
 async def evaluate(selected, output, delay_seconds=65):
     report = {"generated_at": now(), "model": MODEL, "mode": "live", "expected_cases": len(selected),
+              "generation_attempts": MAX_GENERATION_ATTEMPTS,
               "completed": False, "unrun_cases": list(selected), "stopped_reason": None, "results": [], "passed": False}
     with tempfile.TemporaryDirectory() as directory:
         store = Store(Path(directory) / "evaluation.db")

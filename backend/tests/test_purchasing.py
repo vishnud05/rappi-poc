@@ -184,8 +184,11 @@ class PurchasingTests(unittest.TestCase):
         client = MagicMock()
         generate = AsyncMock(return_value=response)
         client.aio.__aenter__.return_value.models.generate_content = generate
-        with patch.dict("os.environ", {"GEMINI_API_KEY": "test-only-not-a-key"}), patch("backend.agent.genai.Client", return_value=client):
+        with patch.dict("os.environ", {"GEMINI_API_KEY": "test-only-not-a-key"}), patch("backend.agent.genai.Client", return_value=client) as factory:
             asyncio.run(run_agent(self.store, run["id"]))
+        retry = factory.call_args.kwargs["http_options"].retry_options
+        self.assertEqual(retry.attempts, 2)
+        self.assertEqual(retry.http_status_codes, [502, 503, 504])
         self.assertEqual(generate.await_count, 12)
         self.assertEqual(self.store.run(run["id"])["status"], "failed")
         self.assertIn("12-turn limit", self.store.run(run["id"])["error"])
