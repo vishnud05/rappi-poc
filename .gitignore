@@ -1,0 +1,31 @@
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# JavaScript build and dependencies
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# Python and local runtime state
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+data/
+*.db
+*.db-shm
+*.db-wal
+
+# Tool output
+.logs/
+.cache/
+test-results/
+playwright-report/
+*.log
+.DS_Store
+Thumbs.db
