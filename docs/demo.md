@@ -1,10 +1,10 @@
 # Buyer agent demo
 
-The demo uses mock purchasing data and a live Gemini agent. Model output may vary; quantities, state changes, and validation determine whether a run is correct.
+The demo uses mock purchasing data and a live NVIDIA NIM agent. Model output may vary; quantities, state changes, and validation determine whether a run is correct.
 
 ## Captured live run
 
-This time-compressed walkthrough uses screenshots captured at checkpoints during a real Gemini 3.1 Flash-Lite run. It shows investigation, a 400-unit request, a 200-unit confirmation, and the resulting buyer-review requirement. It is a recording of observed application states, not a scripted model fallback.
+This historical time-compressed walkthrough uses screenshots captured at checkpoints during a real Gemini 3.1 Flash-Lite run before the NVIDIA NIM migration. It shows investigation, a 400-unit request, a 200-unit confirmation, and the resulting buyer-review requirement. It is a recording of observed application states, not a scripted model fallback.
 
 ![Live supplier-shortfall walkthrough](demo-assets/shortfall-demo.gif)
 
@@ -38,7 +38,7 @@ This is the feedback loop to emphasize: the agent receives the result of its act
 
 ## Explain the design
 
-- Gemini chooses which evidence to inspect and explains its decision. Deterministic Python code owns quantities, prices, constraints, and purchase validation.
+- NVIDIA NIM chooses which evidence to inspect and explains its decision. Deterministic Python code owns quantities, prices, constraints, and purchase validation.
 - SQLite stores the run, evidence events, order, and budget change. Idempotency prevents duplicate orders after a retry.
 - Next.js renders source data and actual backend state. API keys remain in the backend.
 - When evidence is missing or constraints prevent a complete purchase, the agent stops and identifies the buyer intervention required.

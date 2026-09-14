@@ -1,17 +1,18 @@
-"""A bounded live Gemini tool loop. There is no scripted-model fallback."""
+"""A bounded live NVIDIA NIM tool loop. There is no scripted-model fallback."""
 
 import asyncio
+import json
 import os
 from typing import Literal
 
-from google import genai
-from google.genai import types
+from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from backend.policy import assess
 from backend.store import Store, now
 
-MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+MODEL = os.getenv("NVIDIA_MODEL", "meta/llama-3.3-70b-instruct")
+NIM_BASE_URL = "https://integrate.api.nvidia.com/v1"
 MAX_GENERATION_ATTEMPTS = 2
 EVIDENCE = {"read_inventory", "read_demand", "read_supplier_terms", "read_constraints"}
 SYSTEM = """You are the purchasing agent for one product at one fulfillment node.
@@ -196,39 +197,50 @@ class AgentTools:
 
 async def run_agent(store: Store, rid: str):
     async def loop():
-        key = os.getenv("GEMINI_API_KEY")
+        key = os.getenv("NVIDIA_API_KEY")
         if not key:
-            raise RuntimeError("GEMINI_API_KEY is not configured. Set it on the backend and retry.")
+            raise RuntimeError("NVIDIA_API_KEY is not configured. Set it on the backend and retry.")
         agent = AgentTools(store, rid)
         data = store.scenario(agent.sid)
-        contents = [types.Content(role="user", parts=[types.Part.from_text(text=f"Review a recommendation to purchase {data['recommendation_units']} units for product SKU-001 at node FC-01. Investigate, decide, act and verify.")])]
-        declarations = [types.FunctionDeclaration(name=name, description=DESCRIPTIONS[name], parameters_json_schema=model.model_json_schema()) for name, model in ARGUMENTS.items()]
-        config = types.GenerateContentConfig(system_instruction=SYSTEM, temperature=0.1,
-                    tools=[types.Tool(function_declarations=declarations)],
-                    automatic_function_calling=types.AutomaticFunctionCallingConfig(disable=True))
-        http_options = types.HttpOptions(timeout=25000, retry_options=types.HttpRetryOptions(
-            attempts=MAX_GENERATION_ATTEMPTS, initial_delay=1, max_delay=2, http_status_codes=[502, 503, 504]))
-        async with genai.Client(api_key=key, http_options=http_options).aio as client:
+        messages = [
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": f"Review a recommendation to purchase {data['recommendation_units']} units for product SKU-001 at node FC-01. Investigate, decide, act and verify."},
+        ]
+        tools = [{"type": "function", "function": {"name": name, "description": DESCRIPTIONS[name],
+                  "parameters": model.model_json_schema()}} for name, model in ARGUMENTS.items()]
+        async with AsyncOpenAI(api_key=key, base_url=NIM_BASE_URL, timeout=25.0,
+                               max_retries=MAX_GENERATION_ATTEMPTS - 1) as client:
             for turn in range(1, 13):
                 store.event(rid, "info", "model_turn", {"turn": turn, "limit": 12})
-                response = await client.models.generate_content(model=store.run(rid)["model"], contents=contents, config=config)
-                if not response.candidates or not response.candidates[0].content:
+                response = await client.chat.completions.create(
+                    model=store.run(rid)["model"], messages=messages, tools=tools,
+                    tool_choice="auto", temperature=0.1, max_tokens=2048, stream=False)
+                if not response.choices:
                     raise RuntimeError("The model returned no usable response.")
-                content = response.candidates[0].content
-                contents.append(content)
-                calls = [part.function_call for part in content.parts or [] if part.function_call]
+                message = response.choices[0].message
+                calls = message.tool_calls or []
+                assistant = {"role": "assistant", "content": message.content}
+                if calls:
+                    assistant["tool_calls"] = [{"id": call.id, "type": "function", "function": {
+                        "name": call.function.name, "arguments": call.function.arguments}} for call in calls]
+                messages.append(assistant)
                 if not calls:
-                    contents.append(types.Content(role="user", parts=[types.Part.from_text(text="Continue through the tools. Record the evidence-backed decision, execute and verify if appropriate, then call finish_run. Plain text alone does not complete a run.")]))
+                    messages.append({"role": "user", "content": "Continue through the tools. Record the evidence-backed decision, execute and verify if appropriate, then call finish_run. Plain text alone does not complete a run."})
                     continue
-                results = []
                 verification_pending = False
                 for call in calls:
-                    result = agent.call(call.name, dict(call.args or {}), feedback_pending=verification_pending)
-                    verification_pending |= call.name == "verify_outcome" and "checks" in result
-                    results.append(types.Part(function_response=types.FunctionResponse(name=call.name, id=call.id, response=result)))
+                    name = call.function.name
+                    try:
+                        raw_args = json.loads(call.function.arguments or "{}")
+                        args = raw_args if isinstance(raw_args, dict) else {"__invalid_arguments__": raw_args}
+                    except (json.JSONDecodeError, TypeError):
+                        args = {"__invalid_arguments__": call.function.arguments}
+                    result = agent.call(name, args, feedback_pending=verification_pending)
+                    verification_pending |= name == "verify_outcome" and "checks" in result
+                    messages.append({"role": "tool", "tool_call_id": call.id, "name": name,
+                                     "content": json.dumps(result, separators=(",", ":"))})
                     if store.run(rid)["status"] != "running":
                         return
-                contents.append(types.Content(role="tool", parts=results))
         raise RuntimeError("The agent reached its 12-turn limit before resolving the purchase.")
 
     try:
@@ -240,7 +252,7 @@ async def run_agent(store: Store, rid: str):
             message = str(exc)
         else:
             # Provider exceptions can contain request URLs or credentials; expose only type/code.
-            code = getattr(exc, "code", None)
+            code = getattr(exc, "status_code", None) or getattr(exc, "code", None)
             message = ("The model provider rate limit was reached (429). Wait for the quota window to reset before retrying."
                        if code == 429 else f"Model service failed ({type(exc).__name__}{' ' + str(code) if code else ''}). Check backend credentials, model availability and quota.")
         po = store.order(rid)

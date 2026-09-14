@@ -45,7 +45,7 @@ class StartRun(BaseModel):
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "model": MODEL, "model_configured": bool(os.getenv("GEMINI_API_KEY"))}
+    return {"status": "ok", "model": MODEL, "model_configured": bool(os.getenv("NVIDIA_API_KEY"))}
 
 
 @app.get("/api/scenarios")

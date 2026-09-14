@@ -1,13 +1,15 @@
 import asyncio
+import copy
 import json
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi.testclient import TestClient
 
-from backend.agent import AgentTools, EVIDENCE, run_agent, types
+from backend.agent import AgentTools, EVIDENCE, NIM_BASE_URL, run_agent
 from backend.fixtures import fixtures
 from backend.policy import assess, projection
 from backend.store import Conflict, Store
@@ -172,27 +174,77 @@ class PurchasingTests(unittest.TestCase):
 
     def test_missing_key_is_visible_failure(self):
         run = self.store.start_run("review-800", "test-model")
-        with patch.dict("os.environ", {"GEMINI_API_KEY": ""}):
+        with patch.dict("os.environ", {"NVIDIA_API_KEY": ""}):
             asyncio.run(run_agent(self.store, run["id"]))
         self.assertEqual(self.store.run(run["id"])["status"], "failed")
-        self.assertIn("GEMINI_API_KEY", self.store.run(run["id"])["error"])
+        self.assertIn("NVIDIA_API_KEY", self.store.run(run["id"])["error"])
 
     def test_unproductive_model_stops_at_twelve_turns(self):
         run = self.store.start_run("review-800", "test-model")
-        response = types.GenerateContentResponse(candidates=[types.Candidate(content=types.Content(
-            role="model", parts=[types.Part.from_text(text="I will investigate.")]))])
-        client = MagicMock()
+        response = SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(
+            content="I will investigate.", tool_calls=[]))])
         generate = AsyncMock(return_value=response)
-        client.aio.__aenter__.return_value.models.generate_content = generate
-        with patch.dict("os.environ", {"GEMINI_API_KEY": "test-only-not-a-key"}), patch("backend.agent.genai.Client", return_value=client) as factory:
+        client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=generate)))
+        context = MagicMock()
+        context.__aenter__ = AsyncMock(return_value=client)
+        context.__aexit__ = AsyncMock(return_value=None)
+        with patch.dict("os.environ", {"NVIDIA_API_KEY": "test-only-not-a-key"}), patch("backend.agent.AsyncOpenAI", return_value=context) as factory:
             asyncio.run(run_agent(self.store, run["id"]))
-        retry = factory.call_args.kwargs["http_options"].retry_options
-        self.assertEqual(retry.attempts, 2)
-        self.assertEqual(retry.http_status_codes, [502, 503, 504])
+        self.assertEqual(factory.call_args.kwargs["base_url"], NIM_BASE_URL)
+        self.assertEqual(factory.call_args.kwargs["max_retries"], 1)
         self.assertEqual(generate.await_count, 12)
         self.assertEqual(self.store.run(run["id"])["status"], "failed")
         self.assertIn("12-turn limit", self.store.run(run["id"])["error"])
         self.assertIsNone(self.store.order(run["id"]))
+
+    def test_nim_tool_loop_completes_purchase(self):
+        run = self.store.start_run("review-800", "test-model")
+        requests = []
+        call_number = 0
+
+        def completion(*calls):
+            nonlocal call_number
+            tool_calls = []
+            for name, args in calls:
+                call_number += 1
+                tool_calls.append(SimpleNamespace(id=f"call-{call_number}", function=SimpleNamespace(
+                    name=name, arguments=json.dumps(args))))
+            return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=None, tool_calls=tool_calls))])
+
+        async def generate_response(**kwargs):
+            requests.append(copy.deepcopy(kwargs))
+            turn = len(requests)
+            if turn == 1:
+                return completion(*[(name, {}) for name in sorted(EVIDENCE)])
+            if turn == 2:
+                return completion(("assess_purchase", {"proposed_quantity": 400, "rationale": "Evidence supports 400 units."}))
+            if turn == 3:
+                assessment = next(json.loads(item["content"]) for item in reversed(kwargs["messages"])
+                                  if item["role"] == "tool" and item["name"] == "assess_purchase")
+                aid = assessment["assessment_id"]
+                return completion(
+                    ("record_decision", {"assessment_id": aid, "decision": "modify", "quantity": 400,
+                                         "rationale": "The recommendation exceeds the assessed need."}),
+                    ("create_purchase", {"assessment_id": aid}),
+                    ("verify_outcome", {}),
+                )
+            return completion(("finish_run", {"summary": "Purchased and verified 400 units."}))
+
+        generate = AsyncMock(side_effect=generate_response)
+        client = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(create=generate)))
+        context = MagicMock()
+        context.__aenter__ = AsyncMock(return_value=client)
+        context.__aexit__ = AsyncMock(return_value=None)
+        with patch.dict("os.environ", {"NVIDIA_API_KEY": "test-only-not-a-key"}), patch("backend.agent.AsyncOpenAI", return_value=context):
+            asyncio.run(run_agent(self.store, run["id"]))
+
+        finished = self.store.run(run["id"])
+        self.assertEqual(finished["status"], "validated")
+        self.assertEqual(finished["purchase_order"]["requested_units"], 400)
+        self.assertEqual(generate.await_count, 4)
+        self.assertIn("read_inventory", {tool["function"]["name"] for tool in requests[0]["tools"]})
+        tool_result = next(item for item in requests[1]["messages"] if item["role"] == "tool")
+        self.assertTrue(tool_result["tool_call_id"].startswith("call-"))
 
     def test_http_contract(self):
         from backend import main

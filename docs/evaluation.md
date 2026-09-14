@@ -45,7 +45,7 @@ pnpm build
 uv run --env-file .env python -m backend.evaluate --output docs/evaluation-results.json
 ```
 
-The application tests need no model credential. The final command calls the configured Gemini model and writes a JSON report. Omit `--env-file .env` if credentials are already present in the process environment. Evaluation starts are spaced by at least 65 seconds by default; `--delay-seconds 0` disables pacing when your quota permits it. Select individual cases with repeated `--scenario` arguments. Provider quota exhaustion stops the suite and marks remaining cases as unrun.
+The application tests need no model credential. The final command calls the configured NVIDIA NIM model and writes a JSON report. Omit `--env-file .env` if credentials are already present in the process environment. Evaluation starts are spaced by at least 65 seconds by default; `--delay-seconds 0` disables pacing when your quota permits it. Select individual cases with repeated `--scenario` arguments. Provider quota exhaustion stops the suite and marks remaining cases as unrun.
 
 ## Results
 
@@ -53,7 +53,7 @@ Measured on September 14, 2026:
 
 | Check | Observed result |
 | --- | --- |
-| Backend unittest suite | 16 tests passed, including all fixture outcomes, forged assessments, duplicate writes, receipt timing, interrupted runs, and the 12-turn limit |
+| Backend unittest suite | 17 tests passed, including all fixture outcomes, the NVIDIA NIM tool-call adapter, forged assessments, duplicate writes, receipt timing, interrupted runs, and the 12-turn limit |
 | Frontend HTTP test | Passed success, missing-run, conflict, provider-unavailable, and invalid-proxy-response cases |
 | Type checking, ESLint, production build | Passed |
 | Browser main workflow | Gemini 2.5 Flash modified 800 to 400, confirmed 400, committed $2,000, and passed all seven verification checks |
@@ -65,7 +65,7 @@ The successful browser runs are retained as [main](demo-assets/main-live-run.jso
 
 The complete live suite did **not** pass. Gemini 2.5 Flash reached its 20-request daily free-tier quota. A subsequent Gemini 3.1 Flash-Lite evaluation encountered four consecutive provider 503 failures before any tool executed, so six cases were left unrun. [Initial report](evaluation-initial.json).
 
-The final SDK configuration retries 502/503/504 generation failures once, within the 120-second run limit, and does not retry 429 quota failures. A [main-case retry](evaluation-retry.json) created the correct 400-unit order and independently passed all seven checks, but a later provider 503 prevented the model from finishing. The application retained the order and ended as `needs_review`. A [separate alternative-model attempt](evaluation-alternative.json) also received 503 before tool execution. These reports are preserved rather than replaced with claimed passes.
+The Gemini adapter used for these recorded attempts retried 502/503/504 generation failures once, within the 120-second run limit, and did not retry 429 quota failures. A [main-case retry](evaluation-retry.json) created the correct 400-unit order and independently passed all seven checks, but a later provider 503 prevented the model from finishing. The application retained the order and ended as `needs_review`. A [separate alternative-model attempt](evaluation-alternative.json) also received 503 before tool execution. These historical reports remain unchanged after the NVIDIA NIM migration.
 
 The deterministic suite verifies purchasing behavior across all ten fixtures. Successful live runs establish the main and shortfall workflows; provider availability prevented complete live-model coverage. Re-run the live command with available quota before presenting a fresh live demo, and retain the captured walkthrough as backup.
 

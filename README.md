@@ -2,11 +2,11 @@
 
 A buyer console that investigates an 800-unit purchase recommendation, executes a supported decision, and checks the supplier's actual response. The main scenario needs 400 units. A second run demonstrates what happens when the supplier confirms only half the order.
 
-The demo covers recommendation review, budget and storage constraints, purchase execution, and post-action validation. All supplier and inventory operations use seeded mock data. Gemini runs live; provider errors remain visible.
+The demo covers recommendation review, budget and storage constraints, purchase execution, and post-action validation. All supplier and inventory operations use seeded mock data. NVIDIA NIM runs live; provider errors remain visible.
 
 ![Buyer console showing a detected supplier shortfall](docs/demo-assets/production-console.png)
 
-The [captured demo](docs/demo.md#captured-live-run) includes a live supplier-shortfall walkthrough and the actual tool transcript. The [measured results](docs/evaluation.md#results) distinguish passing application checks from provider outages during broader live evaluation.
+The [captured demo](docs/demo.md#captured-live-run) preserves a pre-migration Gemini supplier-shortfall walkthrough and its actual tool transcript. The [measured results](docs/evaluation.md#results) distinguish passing application checks from provider outages during broader live evaluation.
 
 ## Run locally
 
@@ -19,7 +19,7 @@ pnpm install --frozen-lockfile
 uv sync --locked
 ```
 
-Copy [.env.example](.env.example) to `.env` and set `GEMINI_API_KEY`. Use `Copy-Item .env.example .env` in PowerShell or `cp .env.example .env` on macOS/Linux. Keep `.env` private. Do not put the key in a `NEXT_PUBLIC_` variable.
+Copy [.env.example](.env.example) to `.env` and set `NVIDIA_API_KEY`. Use `Copy-Item .env.example .env` in PowerShell or `cp .env.example .env` on macOS/Linux. Keep `.env` private. Do not put the key in a `NEXT_PUBLIC_` variable.
 
 Start the backend from the repository root:
 
@@ -41,8 +41,8 @@ For a production frontend build, run `pnpm build` and then `pnpm start` while th
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `GEMINI_API_KEY` | Required for live runs | Server-side Google AI credential |
-| `GEMINI_MODEL` | `gemini-3.1-flash-lite` | Model used for purchasing runs |
+| `NVIDIA_API_KEY` | Required for live runs | Server-side NVIDIA API Catalog credential |
+| `NVIDIA_MODEL` | `meta/llama-3.3-70b-instruct` | NVIDIA NIM model used for purchasing runs |
 | `DATABASE_PATH` | `data/purchasing.db` | Local SQLite state |
 | `BACKEND_URL` | `http://127.0.0.1:8000` | Server-only Next.js API proxy target |
 
@@ -75,7 +75,7 @@ flowchart LR
     Buyer[Buyer] --> UI[Next.js buyer console]
     UI -->|/api requests| API[FastAPI]
     API --> Loop[Bounded agent tool loop]
-    Loop <--> Model[Gemini]
+    Loop <--> Model[NVIDIA NIM]
     Loop <--> Read[Read purchasing evidence]
     Loop <--> Assess[Calculate and check purchase]
     Loop <--> Purchase[Execute validated assessment]
@@ -122,7 +122,7 @@ Missing evidence, a stockout before supplier delivery, or insufficient budget or
 
 - Next.js, TypeScript, Tailwind CSS, and shadcn/ui provide the console. Native `fetch`, React state, and one-second polling cover run progress without an additional state or streaming library.
 - FastAPI and Pydantic keep the API and input checks close to the purchasing tools. Standard-library SQLite provides atomic persistence without an ORM or separate database service.
-- A small manual Gemini tool loop keeps evidence, actions, and feedback visible. It allows at most 12 model turns and 120 seconds per run. Gemini 3.1 Flash-Lite is the default after live availability checks. During development, Gemini 2.5 Flash completed the main workflow but reached its 20-request daily free-tier limit; the available 3.5 and 3.8 models returned overload errors. Set `GEMINI_MODEL` to choose another available model; the application never silently switches models.
+- A small manual NVIDIA NIM tool loop uses the provider's OpenAI-compatible Chat Completions API. It keeps evidence, actions, and feedback visible and allows at most 12 model turns and 120 seconds per run. `meta/llama-3.3-70b-instruct` is the default because NVIDIA documents function-calling support for it. Set `NVIDIA_MODEL` to choose another NIM model with tool support; the application never silently switches models.
 - Deterministic calculations and execution checks own purchasing constraints. Model judgment remains useful for investigating evidence and explaining the decision.
 - One active run is allowed globally. Reset during an active run returns a conflict. This fits a local single-buyer demo and avoids a job queue.
 
