@@ -1,0 +1,520 @@
+{
+  "generated_at": "2026-09-14T16:56:51.305023+00:00",
+  "model": "gemini-3.1-flash-lite",
+  "mode": "live",
+  "expected_cases": 10,
+  "completed": false,
+  "unrun_cases": [
+    "budget-limit",
+    "storage-limit",
+    "missing-demand",
+    "supplier-shortfall",
+    "timeout-after-commit",
+    "changed-budget"
+  ],
+  "stopped_reason": "Stopped after four consecutive provider503 failures before tool execution; remaining cases were not run.",
+  "results": [
+    {
+      "scenario_id": "review-800",
+      "passed": false,
+      "checks": {
+        "decision": false,
+        "quantity": false,
+        "status": false,
+        "evidence": true,
+        "action": false,
+        "single_order": false,
+        "verification": false,
+        "constraint_compliance": true
+      },
+      "duration_seconds": 4.85,
+      "run": {
+        "id": "21008d3e-508c-4bce-a29d-09561a6593e3",
+        "scenario_id": "review-800",
+        "status": "failed",
+        "decision": null,
+        "quantity": null,
+        "summary": "Automatic processing stopped. Model service failed (ServerError 503). Check backend credentials, model availability and quota.",
+        "model": "gemini-3.1-flash-lite",
+        "created_at": "2026-09-14T16:56:51.345506+00:00",
+        "finished_at": "2026-09-14T16:56:56.201674+00:00",
+        "error": "Model service failed (ServerError 503). Check backend credentials, model availability and quota.",
+        "events": [
+          {
+            "seq": 1,
+            "kind": "info",
+            "name": "run_started",
+            "detail": {
+              "message": "Live agent started. Purchasing services are simulated; model calls are real."
+            },
+            "created_at": "2026-09-14T16:56:51.358768+00:00"
+          },
+          {
+            "seq": 2,
+            "kind": "info",
+            "name": "model_turn",
+            "detail": {
+              "turn": 1,
+              "limit": 12
+            },
+            "created_at": "2026-09-14T16:56:51.790699+00:00"
+          },
+          {
+            "seq": 3,
+            "kind": "tool_call",
+            "name": "read_constraints",
+            "detail": {},
+            "created_at": "2026-09-14T16:56:54.996606+00:00"
+          },
+          {
+            "seq": 4,
+            "kind": "tool_result",
+            "name": "read_constraints",
+            "detail": {
+              "budget_cents": 500000,
+              "capacity_units": 1500
+            },
+            "created_at": "2026-09-14T16:56:55.015366+00:00"
+          },
+          {
+            "seq": 5,
+            "kind": "tool_call",
+            "name": "read_demand",
+            "detail": {},
+            "created_at": "2026-09-14T16:56:55.030609+00:00"
+          },
+          {
+            "seq": 6,
+            "kind": "tool_result",
+            "name": "read_demand",
+            "detail": {
+              "daily_demand_units": 100,
+              "safety_stock_units": 100,
+              "review_days": 7
+            },
+            "created_at": "2026-09-14T16:56:55.046124+00:00"
+          },
+          {
+            "seq": 7,
+            "kind": "tool_call",
+            "name": "read_inventory",
+            "detail": {},
+            "created_at": "2026-09-14T16:56:55.060770+00:00"
+          },
+          {
+            "seq": 8,
+            "kind": "tool_result",
+            "name": "read_inventory",
+            "detail": {
+              "inventory_units": 500,
+              "open_pos": [
+                {
+                  "id": "IN-1042",
+                  "quantity": 200,
+                  "arrival_day": 2,
+                  "status": "confirmed"
+                }
+              ]
+            },
+            "created_at": "2026-09-14T16:56:55.075550+00:00"
+          },
+          {
+            "seq": 9,
+            "kind": "tool_call",
+            "name": "read_supplier_terms",
+            "detail": {},
+            "created_at": "2026-09-14T16:56:55.089387+00:00"
+          },
+          {
+            "seq": 10,
+            "kind": "tool_result",
+            "name": "read_supplier_terms",
+            "detail": {
+              "lead_time_days": 3,
+              "moq_units": 100,
+              "pack_size_units": 50,
+              "unit_cost_cents": 500
+            },
+            "created_at": "2026-09-14T16:56:55.103589+00:00"
+          },
+          {
+            "seq": 11,
+            "kind": "info",
+            "name": "model_turn",
+            "detail": {
+              "turn": 2,
+              "limit": 12
+            },
+            "created_at": "2026-09-14T16:56:55.117523+00:00"
+          },
+          {
+            "seq": 12,
+            "kind": "error",
+            "name": "run_failed",
+            "detail": {
+              "message": "Model service failed (ServerError 503). Check backend credentials, model availability and quota."
+            },
+            "created_at": "2026-09-14T16:56:56.187181+00:00"
+          }
+        ],
+        "purchase_order": null,
+        "validation": null
+      }
+    },
+    {
+      "scenario_id": "accept-800",
+      "passed": false,
+      "checks": {
+        "decision": false,
+        "quantity": false,
+        "status": false,
+        "evidence": true,
+        "action": false,
+        "single_order": false,
+        "verification": false,
+        "constraint_compliance": true
+      },
+      "duration_seconds": 10.68,
+      "run": {
+        "id": "04470467-df1d-4db3-8988-99fef9a1b7fb",
+        "scenario_id": "accept-800",
+        "status": "failed",
+        "decision": null,
+        "quantity": null,
+        "summary": "Automatic processing stopped. Model service failed (ServerError 503). Check backend credentials, model availability and quota.",
+        "model": "gemini-3.1-flash-lite",
+        "created_at": "2026-09-14T16:57:56.381837+00:00",
+        "finished_at": "2026-09-14T16:58:07.089699+00:00",
+        "error": "Model service failed (ServerError 503). Check backend credentials, model availability and quota.",
+        "events": [
+          {
+            "seq": 13,
+            "kind": "info",
+            "name": "run_started",
+            "detail": {
+              "message": "Live agent started. Purchasing services are simulated; model calls are real."
+            },
+            "created_at": "2026-09-14T16:57:56.405070+00:00"
+          },
+          {
+            "seq": 14,
+            "kind": "info",
+            "name": "model_turn",
+            "detail": {
+              "turn": 1,
+              "limit": 12
+            },
+            "created_at": "2026-09-14T16:57:56.769670+00:00"
+          },
+          {
+            "seq": 15,
+            "kind": "tool_call",
+            "name": "read_constraints",
+            "detail": {},
+            "created_at": "2026-09-14T16:58:03.223859+00:00"
+          },
+          {
+            "seq": 16,
+            "kind": "tool_result",
+            "name": "read_constraints",
+            "detail": {
+              "budget_cents": 500000,
+              "capacity_units": 1500
+            },
+            "created_at": "2026-09-14T16:58:03.247444+00:00"
+          },
+          {
+            "seq": 17,
+            "kind": "tool_call",
+            "name": "read_demand",
+            "detail": {},
+            "created_at": "2026-09-14T16:58:03.261054+00:00"
+          },
+          {
+            "seq": 18,
+            "kind": "tool_result",
+            "name": "read_demand",
+            "detail": {
+              "daily_demand_units": 100,
+              "safety_stock_units": 100,
+              "review_days": 7
+            },
+            "created_at": "2026-09-14T16:58:03.278746+00:00"
+          },
+          {
+            "seq": 19,
+            "kind": "tool_call",
+            "name": "read_inventory",
+            "detail": {},
+            "created_at": "2026-09-14T16:58:03.293136+00:00"
+          },
+          {
+            "seq": 20,
+            "kind": "tool_result",
+            "name": "read_inventory",
+            "detail": {
+              "inventory_units": 100,
+              "open_pos": [
+                {
+                  "id": "IN-1042",
+                  "quantity": 200,
+                  "arrival_day": 2,
+                  "status": "confirmed"
+                }
+              ]
+            },
+            "created_at": "2026-09-14T16:58:03.308439+00:00"
+          },
+          {
+            "seq": 21,
+            "kind": "tool_call",
+            "name": "read_supplier_terms",
+            "detail": {},
+            "created_at": "2026-09-14T16:58:03.322529+00:00"
+          },
+          {
+            "seq": 22,
+            "kind": "tool_result",
+            "name": "read_supplier_terms",
+            "detail": {
+              "lead_time_days": 3,
+              "moq_units": 100,
+              "pack_size_units": 50,
+              "unit_cost_cents": 500
+            },
+            "created_at": "2026-09-14T16:58:03.337300+00:00"
+          },
+          {
+            "seq": 23,
+            "kind": "info",
+            "name": "model_turn",
+            "detail": {
+              "turn": 2,
+              "limit": 12
+            },
+            "created_at": "2026-09-14T16:58:03.351259+00:00"
+          },
+          {
+            "seq": 24,
+            "kind": "error",
+            "name": "run_failed",
+            "detail": {
+              "message": "Model service failed (ServerError 503). Check backend credentials, model availability and quota."
+            },
+            "created_at": "2026-09-14T16:58:07.075427+00:00"
+          }
+        ],
+        "purchase_order": null,
+        "validation": null
+      }
+    },
+    {
+      "scenario_id": "sufficient-stock",
+      "passed": false,
+      "checks": {
+        "decision": false,
+        "quantity": false,
+        "status": false,
+        "evidence": true,
+        "action": true,
+        "single_order": true,
+        "verification": false,
+        "constraint_compliance": true
+      },
+      "duration_seconds": 6.15,
+      "run": {
+        "id": "0106bda4-a0f3-47be-847d-c30216cba2f5",
+        "scenario_id": "sufficient-stock",
+        "status": "failed",
+        "decision": null,
+        "quantity": null,
+        "summary": "Automatic processing stopped. Model service failed (ServerError 503). Check backend credentials, model availability and quota.",
+        "model": "gemini-3.1-flash-lite",
+        "created_at": "2026-09-14T16:59:01.430045+00:00",
+        "finished_at": "2026-09-14T16:59:07.598608+00:00",
+        "error": "Model service failed (ServerError 503). Check backend credentials, model availability and quota.",
+        "events": [
+          {
+            "seq": 25,
+            "kind": "info",
+            "name": "run_started",
+            "detail": {
+              "message": "Live agent started. Purchasing services are simulated; model calls are real."
+            },
+            "created_at": "2026-09-14T16:59:01.451532+00:00"
+          },
+          {
+            "seq": 26,
+            "kind": "info",
+            "name": "model_turn",
+            "detail": {
+              "turn": 1,
+              "limit": 12
+            },
+            "created_at": "2026-09-14T16:59:01.814445+00:00"
+          },
+          {
+            "seq": 27,
+            "kind": "tool_call",
+            "name": "read_constraints",
+            "detail": {},
+            "created_at": "2026-09-14T16:59:06.386476+00:00"
+          },
+          {
+            "seq": 28,
+            "kind": "tool_result",
+            "name": "read_constraints",
+            "detail": {
+              "budget_cents": 500000,
+              "capacity_units": 1500
+            },
+            "created_at": "2026-09-14T16:59:06.406050+00:00"
+          },
+          {
+            "seq": 29,
+            "kind": "tool_call",
+            "name": "read_demand",
+            "detail": {},
+            "created_at": "2026-09-14T16:59:06.420640+00:00"
+          },
+          {
+            "seq": 30,
+            "kind": "tool_result",
+            "name": "read_demand",
+            "detail": {
+              "daily_demand_units": 100,
+              "safety_stock_units": 100,
+              "review_days": 7
+            },
+            "created_at": "2026-09-14T16:59:06.435611+00:00"
+          },
+          {
+            "seq": 31,
+            "kind": "tool_call",
+            "name": "read_inventory",
+            "detail": {},
+            "created_at": "2026-09-14T16:59:06.451617+00:00"
+          },
+          {
+            "seq": 32,
+            "kind": "tool_result",
+            "name": "read_inventory",
+            "detail": {
+              "inventory_units": 1000,
+              "open_pos": [
+                {
+                  "id": "IN-1042",
+                  "quantity": 200,
+                  "arrival_day": 2,
+                  "status": "confirmed"
+                }
+              ]
+            },
+            "created_at": "2026-09-14T16:59:06.467259+00:00"
+          },
+          {
+            "seq": 33,
+            "kind": "tool_call",
+            "name": "read_supplier_terms",
+            "detail": {},
+            "created_at": "2026-09-14T16:59:06.481084+00:00"
+          },
+          {
+            "seq": 34,
+            "kind": "tool_result",
+            "name": "read_supplier_terms",
+            "detail": {
+              "lead_time_days": 3,
+              "moq_units": 100,
+              "pack_size_units": 50,
+              "unit_cost_cents": 500
+            },
+            "created_at": "2026-09-14T16:59:06.496615+00:00"
+          },
+          {
+            "seq": 35,
+            "kind": "info",
+            "name": "model_turn",
+            "detail": {
+              "turn": 2,
+              "limit": 12
+            },
+            "created_at": "2026-09-14T16:59:06.510370+00:00"
+          },
+          {
+            "seq": 36,
+            "kind": "error",
+            "name": "run_failed",
+            "detail": {
+              "message": "Model service failed (ServerError 503). Check backend credentials, model availability and quota."
+            },
+            "created_at": "2026-09-14T16:59:07.584848+00:00"
+          }
+        ],
+        "purchase_order": null,
+        "validation": null
+      }
+    },
+    {
+      "scenario_id": "late-incoming",
+      "passed": false,
+      "checks": {
+        "decision": false,
+        "quantity": false,
+        "status": false,
+        "evidence": false,
+        "action": false,
+        "single_order": false,
+        "verification": false,
+        "constraint_compliance": true
+      },
+      "duration_seconds": 1.7,
+      "run": {
+        "id": "de8b8570-e583-4a89-8036-3a07fe09977a",
+        "scenario_id": "late-incoming",
+        "status": "failed",
+        "decision": null,
+        "quantity": null,
+        "summary": "Automatic processing stopped. Model service failed (ServerError 503). Check backend credentials, model availability and quota.",
+        "model": "gemini-3.1-flash-lite",
+        "created_at": "2026-09-14T17:00:06.484320+00:00",
+        "finished_at": "2026-09-14T17:00:08.217976+00:00",
+        "error": "Model service failed (ServerError 503). Check backend credentials, model availability and quota.",
+        "events": [
+          {
+            "seq": 37,
+            "kind": "info",
+            "name": "run_started",
+            "detail": {
+              "message": "Live agent started. Purchasing services are simulated; model calls are real."
+            },
+            "created_at": "2026-09-14T17:00:06.519161+00:00"
+          },
+          {
+            "seq": 38,
+            "kind": "info",
+            "name": "model_turn",
+            "detail": {
+              "turn": 1,
+              "limit": 12
+            },
+            "created_at": "2026-09-14T17:00:06.881914+00:00"
+          },
+          {
+            "seq": 39,
+            "kind": "error",
+            "name": "run_failed",
+            "detail": {
+              "message": "Model service failed (ServerError 503). Check backend credentials, model availability and quota."
+            },
+            "created_at": "2026-09-14T17:00:08.203713+00:00"
+          }
+        ],
+        "purchase_order": null,
+        "validation": null
+      }
+    }
+  ],
+  "passed": false,
+  "generation_attempts": 1
+}

@@ -1,0 +1,495 @@
+{
+  "id": "b892a3d6-206f-4b54-bd7c-236730fd08c8",
+  "scenario_id": "review-800",
+  "status": "validated",
+  "decision": "modify",
+  "quantity": 400,
+  "summary": "Modified purchase recommendation from 800 to 400 units. Requested 400 units, and the supplier confirmed 400 units. All demand is covered, and there is no unresolved shortage.",
+  "model": "gemini-2.5-flash",
+  "created_at": "2026-09-14T16:48:36.505282+00:00",
+  "finished_at": "2026-09-14T16:48:53.075239+00:00",
+  "error": null,
+  "events": [
+    {
+      "seq": 1,
+      "kind": "info",
+      "name": "run_started",
+      "detail": {
+        "message": "Live agent started. Purchasing services are simulated; model calls are real."
+      },
+      "created_at": "2026-09-14T16:48:36.528530+00:00"
+    },
+    {
+      "seq": 2,
+      "kind": "info",
+      "name": "model_turn",
+      "detail": {
+        "turn": 1,
+        "limit": 12
+      },
+      "created_at": "2026-09-14T16:48:37.038808+00:00"
+    },
+    {
+      "seq": 3,
+      "kind": "tool_call",
+      "name": "read_demand",
+      "detail": {},
+      "created_at": "2026-09-14T16:48:39.660760+00:00"
+    },
+    {
+      "seq": 4,
+      "kind": "tool_result",
+      "name": "read_demand",
+      "detail": {
+        "daily_demand_units": 100,
+        "safety_stock_units": 100,
+        "review_days": 7
+      },
+      "created_at": "2026-09-14T16:48:39.688355+00:00"
+    },
+    {
+      "seq": 5,
+      "kind": "tool_call",
+      "name": "read_constraints",
+      "detail": {},
+      "created_at": "2026-09-14T16:48:39.711618+00:00"
+    },
+    {
+      "seq": 6,
+      "kind": "tool_result",
+      "name": "read_constraints",
+      "detail": {
+        "budget_cents": 500000,
+        "capacity_units": 1500
+      },
+      "created_at": "2026-09-14T16:48:39.734949+00:00"
+    },
+    {
+      "seq": 7,
+      "kind": "tool_call",
+      "name": "read_supplier_terms",
+      "detail": {},
+      "created_at": "2026-09-14T16:48:39.756652+00:00"
+    },
+    {
+      "seq": 8,
+      "kind": "tool_result",
+      "name": "read_supplier_terms",
+      "detail": {
+        "lead_time_days": 3,
+        "moq_units": 100,
+        "pack_size_units": 50,
+        "unit_cost_cents": 500
+      },
+      "created_at": "2026-09-14T16:48:39.779858+00:00"
+    },
+    {
+      "seq": 9,
+      "kind": "tool_call",
+      "name": "read_inventory",
+      "detail": {},
+      "created_at": "2026-09-14T16:48:39.802985+00:00"
+    },
+    {
+      "seq": 10,
+      "kind": "tool_result",
+      "name": "read_inventory",
+      "detail": {
+        "inventory_units": 500,
+        "open_pos": [
+          {
+            "id": "IN-1042",
+            "quantity": 200,
+            "arrival_day": 2,
+            "status": "confirmed"
+          }
+        ]
+      },
+      "created_at": "2026-09-14T16:48:39.826166+00:00"
+    },
+    {
+      "seq": 11,
+      "kind": "info",
+      "name": "model_turn",
+      "detail": {
+        "turn": 2,
+        "limit": 12
+      },
+      "created_at": "2026-09-14T16:48:39.847555+00:00"
+    },
+    {
+      "seq": 12,
+      "kind": "tool_call",
+      "name": "assess_purchase",
+      "detail": {
+        "proposed_quantity": 400,
+        "rationale": "Calculated need based on demand, safety stock, on-hand inventory, and confirmed incoming orders over the planning horizon, rounded to MOQ and pack size."
+      },
+      "created_at": "2026-09-14T16:48:43.832198+00:00"
+    },
+    {
+      "seq": 13,
+      "kind": "tool_result",
+      "name": "assess_purchase",
+      "detail": {
+        "quantity": 400,
+        "unrounded_units": 400,
+        "eligible_incoming_units": 200,
+        "total_cost_cents": 200000,
+        "executable": true,
+        "blockers": [],
+        "projection": {
+          "horizon_days": 10,
+          "ending_units": 100,
+          "peak_units": 900,
+          "stockout_days": [],
+          "daily": [
+            {
+              "day": 1,
+              "received_units": 0,
+              "closing_units": 400
+            },
+            {
+              "day": 2,
+              "received_units": 200,
+              "closing_units": 500
+            },
+            {
+              "day": 3,
+              "received_units": 400,
+              "closing_units": 800
+            },
+            {
+              "day": 4,
+              "received_units": 0,
+              "closing_units": 700
+            },
+            {
+              "day": 5,
+              "received_units": 0,
+              "closing_units": 600
+            },
+            {
+              "day": 6,
+              "received_units": 0,
+              "closing_units": 500
+            },
+            {
+              "day": 7,
+              "received_units": 0,
+              "closing_units": 400
+            },
+            {
+              "day": 8,
+              "received_units": 0,
+              "closing_units": 300
+            },
+            {
+              "day": 9,
+              "received_units": 0,
+              "closing_units": 200
+            },
+            {
+              "day": 10,
+              "received_units": 0,
+              "closing_units": 100
+            }
+          ]
+        },
+        "evidence_complete": true,
+        "proposed_quantity": 400,
+        "proposal_matches": true,
+        "assessment_id": "e2b76e10-d4be-40b7-8a5b-6a28e1f89d5a"
+      },
+      "created_at": "2026-09-14T16:48:43.896776+00:00"
+    },
+    {
+      "seq": 14,
+      "kind": "info",
+      "name": "model_turn",
+      "detail": {
+        "turn": 3,
+        "limit": 12
+      },
+      "created_at": "2026-09-14T16:48:43.921850+00:00"
+    },
+    {
+      "seq": 15,
+      "kind": "tool_call",
+      "name": "record_decision",
+      "detail": {
+        "decision": "modify",
+        "assessment_id": "e2b76e10-d4be-40b7-8a5b-6a28e1f89d5a",
+        "quantity": 400,
+        "rationale": "The calculated need is 400 units based on a planning horizon of 10 days (3 days lead time + 7 days review period), a daily demand of 100 units, safety stock of 100 units, on-hand inventory of 500 units, and 200 units of confirmed incoming orders. This quantity satisfies MOQ and pack size requirements, prevents stockouts, and stays within budget and capacity."
+      },
+      "created_at": "2026-09-14T16:48:47.053285+00:00"
+    },
+    {
+      "seq": 16,
+      "kind": "decision",
+      "name": "record_decision",
+      "detail": {
+        "assessment_id": "e2b76e10-d4be-40b7-8a5b-6a28e1f89d5a",
+        "decision": "modify",
+        "quantity": 400,
+        "rationale": "The calculated need is 400 units based on a planning horizon of 10 days (3 days lead time + 7 days review period), a daily demand of 100 units, safety stock of 100 units, on-hand inventory of 500 units, and 200 units of confirmed incoming orders. This quantity satisfies MOQ and pack size requirements, prevents stockouts, and stays within budget and capacity."
+      },
+      "created_at": "2026-09-14T16:48:47.104690+00:00"
+    },
+    {
+      "seq": 17,
+      "kind": "tool_result",
+      "name": "record_decision",
+      "detail": {
+        "recorded": true,
+        "decision": "modify",
+        "quantity": 400
+      },
+      "created_at": "2026-09-14T16:48:47.125689+00:00"
+    },
+    {
+      "seq": 18,
+      "kind": "info",
+      "name": "model_turn",
+      "detail": {
+        "turn": 4,
+        "limit": 12
+      },
+      "created_at": "2026-09-14T16:48:47.157449+00:00"
+    },
+    {
+      "seq": 19,
+      "kind": "tool_call",
+      "name": "create_purchase",
+      "detail": {
+        "assessment_id": "e2b76e10-d4be-40b7-8a5b-6a28e1f89d5a"
+      },
+      "created_at": "2026-09-14T16:48:48.957377+00:00"
+    },
+    {
+      "seq": 20,
+      "kind": "action",
+      "name": "purchase_persisted",
+      "detail": {
+        "purchase_order": {
+          "id": "PO-13088E39",
+          "requested_units": 400,
+          "confirmed_units": 400,
+          "unit_cost_cents": 500,
+          "total_cost_cents": 200000,
+          "arrival_day": 3,
+          "status": "confirmed"
+        }
+      },
+      "created_at": "2026-09-14T16:48:49.040116+00:00"
+    },
+    {
+      "seq": 21,
+      "kind": "tool_result",
+      "name": "create_purchase",
+      "detail": {
+        "purchase_order": {
+          "id": "PO-13088E39",
+          "requested_units": 400,
+          "confirmed_units": 400,
+          "unit_cost_cents": 500,
+          "total_cost_cents": 200000,
+          "arrival_day": 3,
+          "status": "confirmed"
+        },
+        "recovered_existing": false
+      },
+      "created_at": "2026-09-14T16:48:49.062669+00:00"
+    },
+    {
+      "seq": 22,
+      "kind": "info",
+      "name": "model_turn",
+      "detail": {
+        "turn": 5,
+        "limit": 12
+      },
+      "created_at": "2026-09-14T16:48:49.087524+00:00"
+    },
+    {
+      "seq": 23,
+      "kind": "tool_call",
+      "name": "verify_outcome",
+      "detail": {},
+      "created_at": "2026-09-14T16:48:50.735221+00:00"
+    },
+    {
+      "seq": 24,
+      "kind": "validation",
+      "name": "verify_outcome",
+      "detail": {
+        "passed": true,
+        "checks": [
+          {
+            "name": "Order persisted",
+            "passed": true,
+            "detail": "PO-13088E39"
+          },
+          {
+            "name": "Purchase terms",
+            "passed": true,
+            "detail": "Requested quantity, unit price, delivery day and order increments must match the assessed purchasing terms."
+          },
+          {
+            "name": "Supplier confirmation",
+            "passed": true,
+            "detail": "Requested 400 units; supplier confirmed 400."
+          },
+          {
+            "name": "Spend reconciled",
+            "passed": true,
+            "detail": "Committed 200000 cents; remaining budget 300000 cents."
+          },
+          {
+            "name": "Incoming supply persisted",
+            "passed": true,
+            "detail": "Confirmed supply must appear exactly once in incoming inventory."
+          },
+          {
+            "name": "Demand coverage",
+            "passed": true,
+            "detail": "End stock 100; target safety stock 100; shortage 0 units."
+          },
+          {
+            "name": "Storage capacity",
+            "passed": true,
+            "detail": "Peak 900 units; capacity 1500."
+          }
+        ],
+        "shortage_units": 0
+      },
+      "created_at": "2026-09-14T16:48:50.790863+00:00"
+    },
+    {
+      "seq": 25,
+      "kind": "tool_result",
+      "name": "verify_outcome",
+      "detail": {
+        "passed": true,
+        "checks": [
+          {
+            "name": "Order persisted",
+            "passed": true,
+            "detail": "PO-13088E39"
+          },
+          {
+            "name": "Purchase terms",
+            "passed": true,
+            "detail": "Requested quantity, unit price, delivery day and order increments must match the assessed purchasing terms."
+          },
+          {
+            "name": "Supplier confirmation",
+            "passed": true,
+            "detail": "Requested 400 units; supplier confirmed 400."
+          },
+          {
+            "name": "Spend reconciled",
+            "passed": true,
+            "detail": "Committed 200000 cents; remaining budget 300000 cents."
+          },
+          {
+            "name": "Incoming supply persisted",
+            "passed": true,
+            "detail": "Confirmed supply must appear exactly once in incoming inventory."
+          },
+          {
+            "name": "Demand coverage",
+            "passed": true,
+            "detail": "End stock 100; target safety stock 100; shortage 0 units."
+          },
+          {
+            "name": "Storage capacity",
+            "passed": true,
+            "detail": "Peak 900 units; capacity 1500."
+          }
+        ],
+        "shortage_units": 0
+      },
+      "created_at": "2026-09-14T16:48:50.812312+00:00"
+    },
+    {
+      "seq": 26,
+      "kind": "info",
+      "name": "model_turn",
+      "detail": {
+        "turn": 6,
+        "limit": 12
+      },
+      "created_at": "2026-09-14T16:48:50.834633+00:00"
+    },
+    {
+      "seq": 27,
+      "kind": "tool_call",
+      "name": "finish_run",
+      "detail": {
+        "summary": "Modified purchase recommendation from 800 to 400 units. Requested 400 units, and the supplier confirmed 400 units. All demand is covered, and there is no unresolved shortage."
+      },
+      "created_at": "2026-09-14T16:48:53.036843+00:00"
+    },
+    {
+      "seq": 28,
+      "kind": "tool_result",
+      "name": "finish_run",
+      "detail": {
+        "status": "validated"
+      },
+      "created_at": "2026-09-14T16:48:53.103755+00:00"
+    }
+  ],
+  "purchase_order": {
+    "id": "PO-13088E39",
+    "requested_units": 400,
+    "confirmed_units": 400,
+    "unit_cost_cents": 500,
+    "total_cost_cents": 200000,
+    "arrival_day": 3,
+    "status": "confirmed"
+  },
+  "validation": {
+    "passed": true,
+    "checks": [
+      {
+        "name": "Order persisted",
+        "passed": true,
+        "detail": "PO-13088E39"
+      },
+      {
+        "name": "Purchase terms",
+        "passed": true,
+        "detail": "Requested quantity, unit price, delivery day and order increments must match the assessed purchasing terms."
+      },
+      {
+        "name": "Supplier confirmation",
+        "passed": true,
+        "detail": "Requested 400 units; supplier confirmed 400."
+      },
+      {
+        "name": "Spend reconciled",
+        "passed": true,
+        "detail": "Committed 200000 cents; remaining budget 300000 cents."
+      },
+      {
+        "name": "Incoming supply persisted",
+        "passed": true,
+        "detail": "Confirmed supply must appear exactly once in incoming inventory."
+      },
+      {
+        "name": "Demand coverage",
+        "passed": true,
+        "detail": "End stock 100; target safety stock 100; shortage 0 units."
+      },
+      {
+        "name": "Storage capacity",
+        "passed": true,
+        "detail": "Peak 900 units; capacity 1500."
+      }
+    ],
+    "shortage_units": 0
+  }
+}
